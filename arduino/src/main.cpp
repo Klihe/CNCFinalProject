@@ -26,7 +26,7 @@ int stepDelay = 25;
 const int stepDelayWrite = 25;
 const int stepDelayMove = 13;
 const int stepDelayPen = 10;
-const int baudrate = 2000000;
+const long int baudrate = 2000000;
 
 bool calibrated = false;
 bool writing = false;

@@ -2,8 +2,9 @@ import time
 from math import sqrt
 from typing import Literal
 
-from const.const import Const
 from serial import Serial
+
+from const.const import Const
 
 
 class Commands:
