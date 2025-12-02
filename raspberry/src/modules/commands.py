@@ -44,7 +44,7 @@ class Commands:
             distance = sqrt(chunk_dx**2 + chunk_dy**2)
 
             self._base_command(
-                self.CHUNK.format(chunk_dx, chunk_dy),
+                self.CHUNK.format(chunk_dx=chunk_dx, chunk_dy=chunk_dy),
                 distance,
             )
 
