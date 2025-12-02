@@ -29,6 +29,6 @@ class Font:
             if line:
                 scaled_line = [(y * self._font_scale, -x * self._font_scale + x_offset) for x, y in line]
                 all_strokes.append(scaled_line)
-                x_offset += self.font_spacing * self._font_scale
+                x_offset += self._font_spacing * self._font_scale
 
         return all_strokes
