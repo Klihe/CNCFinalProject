@@ -22,19 +22,16 @@ DoubleEndstop double_endstop_x(&endstop_x1, &endstop_x2);
 
 XYMove xy_move(&double_motor_x, &motor_y);
 
-// === Stepper Settings ===
-int stepDelay = 25;   // microseconds between HIGH/LOW (slower for testing)
-const int stepDelayWrite = 25;   // microseconds between HIGH/LOW (slower for testing)
+int stepDelay = 25;
+const int stepDelayWrite = 25;
 const int stepDelayMove = 13;
 const int stepDelayPen = 10;
+const int baudrate = 2000000;
 
 bool calibrated = false;
 bool writing = false;
 
-
-// === Setup ===
 void setup() {
-  // Stepper pins
   double_motor_x.setup();
   motor_y.setup();
   motor_z.setup();
@@ -45,19 +42,17 @@ void setup() {
   endstop_z.setup();
   endstop_pen.setup();
 
-  // Start serial
-  Serial.begin(2000000);
+  Serial.begin(baudrate);
 }
 
 void calibrate() {
-    if (calibrated) return;  // already done
+    if (calibrated) return;
 
     motor_z.change_direction(HIGH);
     while (!endstop_pen.is_pressed()) {
         motor_z.run(100, stepDelayPen);
     }
 
-    // move Z up a safe distance
     motor_z.change_direction(LOW);
     motor_z.run(2000, stepDelayPen);
 
@@ -104,7 +99,6 @@ void loop() {
   }
   if (!calibrated) {
     calibrate();
-    Serial.println("Calibration done.");
   }
 
   // --- Read serial commands ---
