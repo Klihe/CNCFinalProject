@@ -24,9 +24,10 @@ class Font:
     def text_to_strokes(self, text: str) -> list:
         lines = self._font.lines_for_text(text)
         all_strokes = []
+        x_offset = 0
         for line in lines:
             if line:
-                scaled_line = [(y * self._font_scale, -x * self._font_scale) for x, y in line]
+                scaled_line = [(y * self._font_scale, -x * self._font_scale + x_offset) for x, y in line]
                 all_strokes.append(scaled_line)
                 x_offset += self.font_spacing * self._font_scale
 
