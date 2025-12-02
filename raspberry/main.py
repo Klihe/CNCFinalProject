@@ -1,5 +1,4 @@
 import streamlit as st
-
 from modules.machine import Machine
 
 machine = Machine()
