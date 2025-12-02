@@ -1,4 +1,4 @@
-import streamlit as st
+import streamlit as st  # noqa: INP001
 from modules.machine import Machine
 
 machine = Machine()
