@@ -1,9 +1,9 @@
 #include "./modules/motor/motor.h"
 
 Motor::Motor(int stepPin, int enPin, int dirPin) {
-    stepPin = stepPin;
-    enPin = enPin;
-    dirPin = dirPin;
+    this->stepPin = stepPin;
+    this->enPin = enPin;
+    this->dirPin = dirPin;
 }
 
 void Motor::setup() {

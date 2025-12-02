@@ -1,7 +1,7 @@
 #include "./modules/endstop/endstop.h"
 
 Endstop::Endstop(int pin) {
-    pin = pin;
+    this->pin = pin;
 }
 
 void Endstop::setup() {

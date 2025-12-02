@@ -5,19 +5,19 @@ from modules.helpers import distance
 
 
 class Machine:
-    def __init__(self) -> None:
-        self.commands = Commands()
+    def __init__(self, port: None | str = None) -> None:
+        self.commands = Commands(port)
         self.font = Font()
 
     def write_text(self, text: str) -> None:
-        # --- Initialize CNC state ---
+        # --- Draw all strokes ---
         self.commands.pen_up()
         current_x, current_y = 0, 0
         pen_is_down = False
         last_pen_action_pos = (0, 0)
 
-        # --- Draw all strokes ---
-        for stroke in self.font.text_to_strokes(text):
+        all_strokes = self.font.text_to_strokes(text)
+        for stroke in all_strokes:
             if len(stroke) < 1:
                 continue
 
@@ -32,6 +32,7 @@ class Machine:
             # --- Move to start of stroke ---
             dx = int((x0 - current_x) * Const.SLICING.STEP_MULTIPLIER)
             dy = int((y0 - current_y) * Const.SLICING.STEP_MULTIPLIER)
+            self.commands.move(dx, dy)
             current_x, current_y = x0, y0
 
             # --- PEN DOWN if needed ---

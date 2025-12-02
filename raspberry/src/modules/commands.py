@@ -1,5 +1,4 @@
 import time
-from math import sqrt
 from typing import Literal
 
 from serial import Serial
@@ -20,33 +19,33 @@ class Commands:
     NEW_PAGE: str = Const.COMMANDS.NEW_PAGE
     NEXT_LINE: str = Const.COMMANDS.NEXT_LINE
 
-    def __init__(self) -> None:
-        self.serial_communication = Serial(self.PORT, self.BAUD_RATE, timeout=1)
+    def __init__(self, port: None | str = None) -> None:
+        self.serial_communication = Serial(port or self.PORT, self.BAUD_RATE, timeout=1)
 
-    def _base_command(self, command: str, distance: float) -> None:
+    def _base_command(self, command: str) -> None:
         self.serial_communication.write(command.encode())
         self.serial_communication.flush()
-        time.sleep(distance * self.DELAY_PER_UNIT)
 
     def pen_up(self) -> None:
         # distance = ???
-        self._base_command(self.PEN_UP, 10)
+        self._base_command(self.PEN_UP)
+        time.sleep(0.01)
 
     def pen_down(self) -> None:
         # distance = ???
-        self._base_command(self.PEN_DOWN, 10)
+        self._base_command(self.PEN_DOWN)
+        time.sleep(0.01)
 
     def move(self, dx: float, dy: float) -> None:
         while abs(dx) > 0 or abs(dy) > 0:
             chunk_dx = max(-self.CHUNK_SIZE, min(self.CHUNK_SIZE, dx))
             chunk_dy = max(-self.CHUNK_SIZE, min(self.CHUNK_SIZE, dy))
 
-            distance = sqrt(chunk_dx**2 + chunk_dy**2)
+            distance = (chunk_dx**2 + chunk_dy**2)**0.5
 
-            self._base_command(
-                self.CHUNK.format(chunk_dx=chunk_dx, chunk_dy=chunk_dy),
-                distance,
-            )
+            command = self.CHUNK.format(chunk_dx=chunk_dx, chunk_dy=chunk_dy)
+            self._base_command(command)
+            time.sleep(distance * self.DELAY_PER_UNIT)
 
             dx -= chunk_dx
             dy -= chunk_dy

@@ -28,46 +28,56 @@ const int stepDelayMove = 13;
 const int stepDelayPen = 10;
 const long int baudrate = 2000000;
 
+const long int max_x = 65000;
+const int max_y = 40000;
+
 bool calibrated = false;
 bool writing = false;
 
 void setup() {
+  Serial.begin(baudrate);
+
+  Serial.println("Initializing motors...");
   double_motor_x.setup();
   motor_y.setup();
   motor_z.setup();
 
-
+  Serial.println("Initializing endstops...");
   double_endstop_x.setup();
   endstop_y.setup();
   endstop_z.setup();
   endstop_pen.setup();
 
-  Serial.begin(baudrate);
+  Serial.println("Setup complete...");
 }
 
 void calibrate() {
     if (calibrated) return;
 
+    Serial.println("Calibrating axis z...");
     motor_z.change_direction(HIGH);
     while (!endstop_pen.is_pressed()) {
         motor_z.run(100, stepDelayPen);
     }
 
     motor_z.change_direction(LOW);
-    motor_z.run(2000, stepDelayPen);
+    motor_z.run(5000, stepDelayPen);
 
+    Serial.println("Calibrating axis y...");
     motor_y.change_direction(LOW);
     while (!endstop_y.is_pressed()) {
       motor_y.run(100, stepDelayMove);
     }
 
+    Serial.println("Calibrating axis x...");
     double_motor_x.change_direction(LOW);
     while (!double_endstop_x.is_pressed()) {
       double_motor_x.run(100, stepDelayMove);
     }
 
+    Serial.println("Moving to left-upper conrner");
+    xy_move.run(1000, max_x, stepDelayMove);
     calibrated = true;
-    xy_move.run(30000, 0, stepDelayMove);
 }
 
 void togglePen(bool write) {
@@ -77,7 +87,7 @@ void togglePen(bool write) {
           if (endstop_pen.is_pressed()) {
             writing = true;
             break;
-          }
+          } 
             motor_z.change_direction(HIGH);
             motor_z.run(100, stepDelayPen);
         }
