@@ -1,6 +1,6 @@
 from HersheyFonts import HersheyFonts
 
-from const import Const
+from const.const import Const
 
 
 class Font:
