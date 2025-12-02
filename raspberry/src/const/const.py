@@ -3,9 +3,9 @@ class _Communication: # -> Const
     BAUD_RATE: int = 2_000_000
 
 class _Slicing: # -> Const
-    DISTANCE_THRESHOLD: float = 1e-5 # seconds per unit
+    DISTANCE_THRESHOLD: float = 1e-4 # seconds per unit
     STEP_MULTIPLIER: int = 100
-    DELAY_PER_UNIT: float = 1e-3
+    DELAY_PER_UNIT: float = 12e-5
     CHUNK_SIZE: int = 2_000
 
 class _Font: # -> Const

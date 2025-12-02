@@ -121,6 +121,9 @@ void loop() {
       togglePen(true);
     } else if (input == "PEN_UP") {
       togglePen(false);
+    } else if (input == "NEXT_LINE") {
+      double_motor_x.change_direction(HIGH);
+      double_motor_x.run(1200, stepDelayMove);
     } else {
       // XY move command
       int commaIndex = input.indexOf(',');
