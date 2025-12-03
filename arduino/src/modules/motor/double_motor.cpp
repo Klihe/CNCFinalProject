@@ -16,13 +16,13 @@ void DoubleMotor::change_direction(bool clockwise) {
     motor2->change_direction(!clockwise);
 }
 
-void DoubleMotor::run(long int steps, int step_delay) {
-    for (long int i = 0; i < steps; i++) {
-        digitalWrite(motor1->stepPin, HIGH);
-        digitalWrite(motor2->stepPin, HIGH);
+void DoubleMotor::run(uint16_t steps, uint8_t step_delay) {
+    for (uint32_t i = 0; i < steps; i++) {
+        digitalWrite(motor1->step_pin, HIGH);
+        digitalWrite(motor2->step_pin, HIGH);
         delayMicroseconds(step_delay);
-        digitalWrite(motor1->stepPin, LOW);
-        digitalWrite(motor2->stepPin, LOW);
+        digitalWrite(motor1->step_pin, LOW);
+        digitalWrite(motor2->step_pin, LOW);
         delayMicroseconds(step_delay);
     }
 }

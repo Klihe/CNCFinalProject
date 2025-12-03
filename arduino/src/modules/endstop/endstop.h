@@ -5,9 +5,9 @@
 
 class Endstop {
     public:
-        int pin;
+        uint8_t pin;
 
-    Endstop(int pin);
+    Endstop(uint8_t pin);
 
     void setup();
     bool is_pressed();

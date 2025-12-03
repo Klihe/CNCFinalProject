@@ -1,6 +1,6 @@
 #include "./modules/endstop/endstop.h"
 
-Endstop::Endstop(int pin) {
+Endstop::Endstop(uint8_t pin) {
     this->pin = pin;
 }
 

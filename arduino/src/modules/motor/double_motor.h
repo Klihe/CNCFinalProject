@@ -12,7 +12,7 @@ class DoubleMotor {
 
         void setup();
         void change_direction(bool clockwise);
-        void run(long int steps, int step_delay);
+        void run(uint16_t steps, uint8_t step_delay);
 };
 
 #endif

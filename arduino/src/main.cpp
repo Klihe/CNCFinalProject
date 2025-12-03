@@ -22,14 +22,15 @@ DoubleEndstop double_endstop_x(&endstop_x1, &endstop_x2);
 
 XYMove xy_move(&double_motor_x, &motor_y);
 
-int stepDelay = 25;
-const int stepDelayWrite = 25;
-const int stepDelayMove = 13;
-const int stepDelayPen = 10;
-const long int baudrate = 2000000;
+uint8_t stepDelay = 25;
+const uint8_t stepDelayWrite = 25;
+const uint8_t stepDelayMove = 13;
+const uint8_t stepDelayPen = 10;
 
-const long int max_x = 65000;
-const int max_y = 40000;
+const uint16_t max_x = 65000;
+const uint16_t max_y = 40000;
+
+const uint32_t baudrate = 2000000;
 
 bool calibrated = false;
 bool writing = false;
