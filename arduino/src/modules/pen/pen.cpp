@@ -5,17 +5,17 @@ Pen::Pen(Motor* motor, Endstop* endstop) {
     this->endstop = endstop;
 }
 
-void Pen::write(bool write, uint8_t step_delay) {
+void Pen::write(bool write) {
     if (write) {
         motor->change_direction(HIGH);
         while (!endstop->is_pressed()) {
-            motor->step(step_delay);
+            motor->step();
         }
     } else {
         motor->change_direction(LOW);
         while (endstop->is_pressed()) {
-            motor->step(step_delay);
+            motor->step();
         }
-        motor->run(1000, step_delay);
+        motor->run(1000);
     }
 }

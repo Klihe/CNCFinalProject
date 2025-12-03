@@ -6,6 +6,18 @@
 #include <./modules/move/move.h>
 #include <./modules/pen/pen.h>
 
+const uint8_t step_delay_write = 25;
+const uint8_t step_delay_move = 13;
+uint8_t step_delay = step_delay_move;
+
+const uint16_t max_x = 65000;
+const uint16_t max_y = 40000;
+
+const uint32_t baudrate = 2000000;
+
+bool calibrated = false;
+bool writing = false;
+
 Endstop endstop_x1(A0);
 Endstop endstop_x2(A3);
 Endstop endstop_y(A1);
@@ -15,28 +27,15 @@ Endstop endstop_pen(A2);
 
 DoubleEndstop double_endstop_x(&endstop_x1, &endstop_x2);
 
-Motor motor_x1(2, 3, 4, &endstop_x1);
-Motor motor_x2(11, 12, 13, &endstop_x2);
-Motor motor_y(5, 6, 7, &endstop_y);
-Motor motor_z(8, 9, 10, &endstop_z);
+Motor motor_x1(2, 3, 4, &endstop_x1, &step_delay);
+Motor motor_x2(11, 12, 13, &endstop_x2, &step_delay);
+Motor motor_y(5, 6, 7, &endstop_y, &step_delay);
+Motor motor_z(8, 9, 10, &endstop_z, &step_delay);
 
-DoubleMotor double_motor_x(&motor_x1, &motor_x2, &double_endstop_x);
+DoubleMotor double_motor_x(&motor_x1, &motor_x2, &double_endstop_x, &step_delay);
 
 Move move(&double_motor_x, &motor_y);
 Pen pen(&motor_z, &endstop_z);
-
-uint8_t stepDelay = 25;
-const uint8_t stepDelayWrite = 25;
-const uint8_t stepDelayMove = 13;
-const uint8_t stepDelayPen = 10;
-
-const uint16_t max_x = 65000;
-const uint16_t max_y = 40000;
-
-const uint32_t baudrate = 2000000;
-
-bool calibrated = false;
-bool writing = false;
 
 void setup() {
   Serial.begin(baudrate);
@@ -60,30 +59,30 @@ void calibrate() {
 
     Serial.println("Calibrating axis z...");
     motor_z.change_direction(HIGH);
-    motor_z.calibrate(stepDelay);
+    motor_z.calibrate();
 
     motor_z.change_direction(LOW);
-    motor_z.run(5000, stepDelayPen);
+    motor_z.run(5000);
 
     Serial.println("Calibrating axis y...");
     motor_y.change_direction(LOW);
-    motor_y.calibrate(stepDelay);
+    motor_y.calibrate();
 
     Serial.println("Calibrating axis x...");
     double_motor_x.change_direction(LOW);
-    double_motor_x.calibrate(stepDelay);
+    double_motor_x.calibrate();
 
     Serial.println("Moving to left-upper conrner");
-    move.run(1000, max_x, stepDelayMove);
+    move.run(1000, max_x);
     calibrated = true;
 }
 
 void loop() {
   // --- Ensure motors are calibrated ---
   if (writing) {
-    stepDelay = stepDelayWrite;
+    step_delay = step_delay_move;
   } else {
-    stepDelay = stepDelayMove;
+    step_delay = step_delay_move;
   }
   if (!calibrated) {
     calibrate();
@@ -96,19 +95,19 @@ void loop() {
 
     // Pen commands
     if (input == "PEN_DOWN") {
-      pen.write(HIGH, stepDelayPen);
+      pen.write(HIGH);
     } else if (input == "PEN_UP") {
-      pen.write(LOW, stepDelayPen);
+      pen.write(LOW);
     } else if (input == "NEXT_LINE") {
       double_motor_x.change_direction(HIGH);
-      double_motor_x.run(1200, stepDelay);
+      double_motor_x.run(1200);
     } else {
       // XY move command
       int commaIndex = input.indexOf(',');
       if (commaIndex != -1) {
         long x = input.substring(0, commaIndex).toInt();
         long y = input.substring(commaIndex + 1).toInt();
-        move.run(x, y, stepDelay);
+        move.run(x, y);
       }
     }
   }

@@ -7,7 +7,7 @@ Move::Move(DoubleMotor* axis_x, Motor* axis_y) {
     this->axis_y = axis_y;
 }
 
-void Move::run(long steps_x, long steps_y, uint8_t step_delay) {
+void Move::run(long steps_x, long steps_y) {
     if (steps_x > 0) axis_x->change_direction(HIGH);
     else axis_x->change_direction(LOW);
 
@@ -24,14 +24,14 @@ void Move::run(long steps_x, long steps_y, uint8_t step_delay) {
             error -= dy;
             dx--;
 
-            axis_x->run(1, step_delay);
+            axis_x->run(1);
         }
 
         if (error < dx) {
             error += dx;
             dy--;
 
-            axis_y->run(1, step_delay);
+            axis_y->run(1);
         }
 
         if (dx == prev_dx && dy == prev_dy) {

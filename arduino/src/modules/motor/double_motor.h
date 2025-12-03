@@ -9,18 +9,20 @@ class DoubleMotor {
         Motor* motor1;
         Motor* motor2;
         DoubleEndstop* double_endstop;
+        uint8_t* step_delay;
 
         DoubleMotor(
             Motor* motor1,
             Motor* motor2,
-            DoubleEndstop* double_endstop
+            DoubleEndstop* double_endstop,
+            uint8_t* step_delay
         );
 
         void setup();
         void change_direction(bool clockwise);
-        void step(uint8_t step_delay);
-        void calibrate(uint8_t step_delay);
-        void run(uint16_t steps, uint8_t step_delay);
+        void step();
+        void calibrate();
+        void run(uint16_t steps);
 };
 
 #endif

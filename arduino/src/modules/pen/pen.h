@@ -11,7 +11,7 @@ class Pen {
 
     Pen(Motor* motor, Endstop* endstop);
 
-    void write(bool write, uint8_t step_delay);
+    void write(bool write);
 };
 
 #endif // PEN_H

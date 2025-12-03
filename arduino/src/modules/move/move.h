@@ -11,7 +11,7 @@ class Move {
 
         Move(DoubleMotor* axis_x, Motor* axis_y);
 
-        void run(long steps_x, long steps_y, uint8_t step_delay);
+        void run(long steps_x, long steps_y);
 };
 
 #endif
