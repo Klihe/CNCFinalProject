@@ -9,3 +9,7 @@ uint16_t Const::ONE_LINE_WIDTH = 1200;
 uint8_t Const::STEP_DELAY_WRITING = 25;
 uint8_t Const::STEP_DELAY_MOVING  = 13;
 
+String Const::COMMAND_PEN_DOWN = "PEN_DOWN";
+String Const::COMMAND_PEN_UP = "PEN_UP";
+String Const::COMMAND_NEXT_LINE = "NEXT_LINE";
+

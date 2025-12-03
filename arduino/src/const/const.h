@@ -13,6 +13,10 @@ class Const {
 
     static uint8_t STEP_DELAY_WRITING;
     static uint8_t STEP_DELAY_MOVING;
+
+    static String COMMAND_PEN_DOWN;
+    static String COMMAND_PEN_UP;
+    static String COMMAND_NEXT_LINE;
 };
 
 #endif // CONST_H

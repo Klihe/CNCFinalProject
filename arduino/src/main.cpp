@@ -80,11 +80,11 @@ void loop() {
     calibrate();
   }
 
-  if (command == "PEN_DOWN") {
+  if (command == Const::COMMAND_PEN_DOWN) {
     pen.write(HIGH);
-  } else if (command == "PEN_UP") {
+  } else if (command == Const::COMMAND_PEN_UP) {
     pen.write(LOW);
-  } else if (command == "NEXT_LINE") {
+  } else if (command == Const::COMMAND_NEXT_LINE) {
     double_motor_x.change_direction(HIGH);
     double_motor_x.run(Const::ONE_LINE_WIDTH);
   } else {
