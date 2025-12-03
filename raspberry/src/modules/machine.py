@@ -10,6 +10,7 @@ class Machine:
         self.font = Font()
 
     def write_text(self, text: str) -> None:
+        print("writing")
         # --- Draw all strokes ---
         self.commands.pen_up()
         current_x, current_y = 0, 0
