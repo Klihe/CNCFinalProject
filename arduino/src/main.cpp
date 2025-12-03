@@ -3,7 +3,8 @@
 #include <./modules/motor/double_motor.h>
 #include <./modules/endstop/endstop.h>
 #include <./modules/endstop/double_endstop.h>
-#include <./modules/move/xy_move.h>
+#include <./modules/move/move.h>
+#include <./modules/pen/pen.h>
 
 Endstop endstop_x1(A0);
 Endstop endstop_x2(A3);
@@ -21,7 +22,8 @@ Motor motor_z(8, 9, 10, &endstop_z);
 
 DoubleMotor double_motor_x(&motor_x1, &motor_x2, &double_endstop_x);
 
-XYMove xy_move(&double_motor_x, &motor_y);
+Move move(&double_motor_x, &motor_y);
+Pen pen(&motor_z, &endstop_z);
 
 uint8_t stepDelay = 25;
 const uint8_t stepDelayWrite = 25;
@@ -72,28 +74,8 @@ void calibrate() {
     double_motor_x.calibrate(stepDelay);
 
     Serial.println("Moving to left-upper conrner");
-    xy_move.run(1000, max_x, stepDelayMove);
+    move.run(1000, max_x, stepDelayMove);
     calibrated = true;
-}
-
-void togglePen(bool write) {
-    if (write) {
-        // Lower pen until endstop is triggered
-        while (HIGH) {
-          if (endstop_pen.is_pressed()) {
-            writing = true;
-            break;
-          } 
-            motor_z.change_direction(HIGH);
-            motor_z.run(100, stepDelayPen);
-        }
-    } else {
-        // Raise pen only if it’s not already up
-        motor_z.change_direction(LOW);
-        while (endstop_pen.is_pressed()) {
-            motor_z.run(500, stepDelayPen);
-        }
-    }
 }
 
 void loop() {
@@ -114,9 +96,9 @@ void loop() {
 
     // Pen commands
     if (input == "PEN_DOWN") {
-      togglePen(true);
+      pen.write(HIGH, stepDelayPen);
     } else if (input == "PEN_UP") {
-      togglePen(false);
+      pen.write(LOW, stepDelayPen);
     } else if (input == "NEXT_LINE") {
       double_motor_x.change_direction(HIGH);
       double_motor_x.run(1200, stepDelay);
@@ -126,7 +108,7 @@ void loop() {
       if (commaIndex != -1) {
         long x = input.substring(0, commaIndex).toInt();
         long y = input.substring(commaIndex + 1).toInt();
-        xy_move.run(x, y, stepDelay);
+        move.run(x, y, stepDelay);
       }
     }
   }

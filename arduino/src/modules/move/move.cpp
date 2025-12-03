@@ -1,8 +1,8 @@
-#include <./modules/move/xy_move.h>
+#include <./modules/move/move.h>
 #include <./modules/motor/motor.h>
 #include <./modules/motor/double_motor.h>
 
-XYMove::XYMove(DoubleMotor* axis_x, Motor* axis_y) {
+Move::Move(DoubleMotor* axis_x, Motor* axis_y) {
     this->axis_x = axis_x;
     this->axis_y = axis_y;
 }
