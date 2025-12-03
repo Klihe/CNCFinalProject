@@ -7,7 +7,7 @@ Move::Move(DoubleMotor* axis_x, Motor* axis_y) {
     this->axis_y = axis_y;
 }
 
-void XYMove::run(long steps_x, long steps_y, uint8_t step_delay) {
+void Move::run(long steps_x, long steps_y, uint8_t step_delay) {
     if (steps_x > 0) axis_x->change_direction(HIGH);
     else axis_x->change_direction(LOW);
 
