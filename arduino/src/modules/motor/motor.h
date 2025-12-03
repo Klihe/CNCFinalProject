@@ -5,13 +5,13 @@
 #include <./modules/endstop/endstop.h>
 
 class Motor {
-public:
-    uint8_t step_pin;
-    uint8_t enable_pin;
-    uint8_t direction_pin;
+    public:
+        uint8_t step_pin;
+        uint8_t enable_pin;
+        uint8_t direction_pin;
 
-    Endstop* endstop;
-    uint8_t* step_delay;
+        Endstop* endstop;
+        uint8_t* step_delay;
 
     Motor(
         uint8_t step_pin,
