@@ -5,15 +5,9 @@
 #include <./modules/endstop/double_endstop.h>
 #include <./modules/move/move.h>
 #include <./modules/pen/pen.h>
+#include <./const/const.h>
 
-const uint8_t step_delay_write = 25;
-const uint8_t step_delay_move = 13;
-uint8_t step_delay = step_delay_move;
-
-const uint16_t max_x = 65000;
-const uint16_t max_y = 40000;
-
-const uint32_t baudrate = 2000000;
+uint8_t step_delay = Const::STEP_DELAY_MOVING;
 
 bool calibrated = false;
 bool writing = false;
@@ -38,7 +32,7 @@ Move move(&double_motor_x, &motor_y);
 Pen pen(&motor_z, &endstop_z);
 
 void setup() {
-  Serial.begin(baudrate);
+  Serial.begin(Const::BAUDRATE);
 
   Serial.println("Initializing motors...");
   double_motor_x.setup();
@@ -73,16 +67,16 @@ void calibrate() {
     double_motor_x.calibrate();
 
     Serial.println("Moving to left-upper conrner");
-    move.run(1000, max_x);
+    move.run(1000, Const::MAX_X);
     calibrated = true;
 }
 
 void loop() {
   // --- Ensure motors are calibrated ---
   if (writing) {
-    step_delay = step_delay_move;
+    step_delay = Const::STEP_DELAY_WRITING;
   } else {
-    step_delay = step_delay_move;
+    step_delay = Const::STEP_DELAY_MOVING;
   }
   if (!calibrated) {
     calibrate();
