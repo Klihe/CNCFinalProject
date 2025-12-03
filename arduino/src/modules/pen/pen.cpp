@@ -9,7 +9,7 @@ Pen::Pen(Motor* motor, Endstop* endstop) {
 void Pen::write(bool write) {
     if (write) {
         motor->change_direction(HIGH);
-        motor->step_delay = &Const::STEP_DELAY_WRITING;
+        motor->step_delay = &Const::STEP_DELAY_MOVING; // STEP_DELAY_WRITING
         while (!endstop->is_pressed()) {
             motor->step();
         }
