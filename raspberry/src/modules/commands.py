@@ -24,7 +24,7 @@ class Commands:
         self.serial_communication = Serial(port or self.PORT, self.BAUD_RATE, timeout=1)
 
     def _base_command(self, command: str, distance: float) -> None:
-        self.serial_communication.write(command.encode())
+        self.serial_communication.write((command+"\n").encode())
         self.serial_communication.flush()
         time.sleep(distance * self.DELAY_PER_UNIT)
 

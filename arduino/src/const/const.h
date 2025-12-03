@@ -13,8 +13,6 @@ class Const {
 
     static uint8_t STEP_DELAY_WRITING;
     static uint8_t STEP_DELAY_MOVING;
-
-
 };
 
 #endif // CONST_H

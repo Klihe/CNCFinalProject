@@ -14,11 +14,11 @@ class _Font: # -> Const
     NAME: str = "futural"
 
 class _Commands: # -> Const
-    PEN_UP: str = "PEN_UP\n"
-    PEN_DOWN: str = "PEN_DOWN\n"
-    CHUNK: str = "{chunk_dx}, {chunk_dy}\n"
-    NEW_PAGE: str = "{page}_PAGE\n"
-    NEXT_LINE: str = "NEXT_LINE\n"
+    PEN_UP: str = "PEN_UP"
+    PEN_DOWN: str = "PEN_DOWN"
+    CHUNK: str = "{chunk_dx}, {chunk_dy}"
+    NEW_PAGE: str = "{page}_PAGE"
+    NEXT_LINE: str = "NEXT_LINE"
 
 class Const:
     COMMUNICATION = _Communication()
