@@ -94,7 +94,7 @@ void loop() {
       pen.write(LOW);
     } else if (input == "NEXT_LINE") {
       double_motor_x.change_direction(HIGH);
-      double_motor_x.run(1200);
+      double_motor_x.run(Const::ONE_LINE_WIDTH);
     } else {
       // XY move command
       int commaIndex = input.indexOf(',');
