@@ -11,7 +11,7 @@ class XYMove {
 
         XYMove(DoubleMotor* axis_x, Motor* axis_y);
 
-        void run(uint16_t steps_x, uint16_t steps_y, uint8_t step_delay);
+        void run(long steps_x, long steps_y, uint8_t step_delay);
 };
 
 #endif

@@ -24,7 +24,7 @@ void Motor::step(uint8_t step_delay) {
 }
 
 void Motor::run(uint16_t steps, uint8_t step_delay) {
-    for (uint32_t i = 0; i < steps; i++) {
+    for (uint16_t i = 0; i < steps; i++) {
         step(step_delay);
     }
 }

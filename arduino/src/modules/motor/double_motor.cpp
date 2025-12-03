@@ -17,7 +17,7 @@ void DoubleMotor::change_direction(bool clockwise) {
 }
 
 void DoubleMotor::run(uint16_t steps, uint8_t step_delay) {
-    for (uint32_t i = 0; i < steps; i++) {
+    for (uint16_t i = 0; i < steps; i++) {
         digitalWrite(motor1->step_pin, HIGH);
         digitalWrite(motor2->step_pin, HIGH);
         delayMicroseconds(step_delay);
