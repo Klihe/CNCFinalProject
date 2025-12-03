@@ -32,7 +32,7 @@ void DoubleMotor::step(uint8_t step_delay) {
 }
 
 void DoubleMotor::calibrate(uint8_t step_delay) {
-    while (double_endstop->is_pressed()) {
+    while (!double_endstop->is_pressed()) {
         step(step_delay);
     }
 }
