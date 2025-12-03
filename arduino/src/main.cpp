@@ -5,20 +5,21 @@
 #include <./modules/endstop/double_endstop.h>
 #include <./modules/move/xy_move.h>
 
-Motor motor_x1(2, 3, 4);
-Motor motor_x2(11, 12, 13);
-Motor motor_y(5, 6, 7);
-Motor motor_z(8, 9, 10);
-
-DoubleMotor double_motor_x(&motor_x1, &motor_x2);
-
 Endstop endstop_x1(A0);
 Endstop endstop_x2(A3);
 Endstop endstop_y(A1);
 Endstop endstop_z(A2);
+
 Endstop endstop_pen(A2);
 
 DoubleEndstop double_endstop_x(&endstop_x1, &endstop_x2);
+
+Motor motor_x1(2, 3, 4, &endstop_x1);
+Motor motor_x2(11, 12, 13, &endstop_x2);
+Motor motor_y(5, 6, 7, &endstop_y);
+Motor motor_z(8, 9, 10, &endstop_z);
+
+DoubleMotor double_motor_x(&motor_x1, &motor_x2, &double_endstop_x);
 
 XYMove xy_move(&double_motor_x, &motor_y);
 
@@ -57,24 +58,18 @@ void calibrate() {
 
     Serial.println("Calibrating axis z...");
     motor_z.change_direction(HIGH);
-    while (!endstop_pen.is_pressed()) {
-        motor_z.run(100, stepDelayPen);
-    }
+    motor_z.calibrate(stepDelay);
 
     motor_z.change_direction(LOW);
     motor_z.run(5000, stepDelayPen);
 
     Serial.println("Calibrating axis y...");
     motor_y.change_direction(LOW);
-    while (!endstop_y.is_pressed()) {
-      motor_y.run(100, stepDelayMove);
-    }
+    motor_y.calibrate(stepDelay);
 
     Serial.println("Calibrating axis x...");
     double_motor_x.change_direction(LOW);
-    while (!double_endstop_x.is_pressed()) {
-      double_motor_x.run(100, stepDelayMove);
-    }
+    double_motor_x.calibrate(stepDelay);
 
     Serial.println("Moving to left-upper conrner");
     xy_move.run(1000, max_x, stepDelayMove);
@@ -124,14 +119,14 @@ void loop() {
       togglePen(false);
     } else if (input == "NEXT_LINE") {
       double_motor_x.change_direction(HIGH);
-      double_motor_x.run(1200, stepDelayMove);
+      double_motor_x.run(1200, stepDelay);
     } else {
       // XY move command
       int commaIndex = input.indexOf(',');
       if (commaIndex != -1) {
         long x = input.substring(0, commaIndex).toInt();
         long y = input.substring(commaIndex + 1).toInt();
-        xy_move.run(x, y, stepDelayWrite);
+        xy_move.run(x, y, stepDelay);
       }
     }
   }
