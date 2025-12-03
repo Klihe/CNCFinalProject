@@ -6,11 +6,15 @@
 #include <./modules/move/move.h>
 #include <./modules/pen/pen.h>
 #include <./const/const.h>
+#include <./modules/commands/commands.h>
 
 uint8_t step_delay = Const::STEP_DELAY_MOVING;
 
 bool calibrated = false;
 bool writing = false;
+
+String command = "";
+Commands commands(&command);
 
 Endstop endstop_x1(A0);
 Endstop endstop_x2(A3);
@@ -72,37 +76,23 @@ void calibrate() {
 }
 
 void loop() {
-  // --- Ensure motors are calibrated ---
-  if (writing) {
-    step_delay = Const::STEP_DELAY_WRITING;
-  } else {
-    step_delay = Const::STEP_DELAY_MOVING;
-  }
   if (!calibrated) {
     calibrate();
   }
 
-  // --- Read serial commands ---
-  if (Serial.available() > 0) {
-    String input = Serial.readStringUntil('\n');
-    input.trim();
-
-    // Pen commands
-    if (input == "PEN_DOWN") {
-      pen.write(HIGH);
-    } else if (input == "PEN_UP") {
-      pen.write(LOW);
-    } else if (input == "NEXT_LINE") {
-      double_motor_x.change_direction(HIGH);
-      double_motor_x.run(Const::ONE_LINE_WIDTH);
-    } else {
-      // XY move command
-      int commaIndex = input.indexOf(',');
-      if (commaIndex != -1) {
-        long x = input.substring(0, commaIndex).toInt();
-        long y = input.substring(commaIndex + 1).toInt();
+  if (command == "PEN_DOWN") {
+    pen.write(HIGH);
+  } else if (command == "PEN_UP") {
+    pen.write(LOW);
+  } else if (command == "NEXT_LINE") {
+    double_motor_x.change_direction(HIGH);
+    double_motor_x.run(Const::ONE_LINE_WIDTH);
+  } else {
+    int comma_index = command.indexOf(',');
+    if (comma_index != 1) {
+        long x = command.substring(0, comma_index).toInt();
+        long y = command.substring(comma_index + 1).toInt();
         move.run(x, y);
-      }
     }
   }
 }
