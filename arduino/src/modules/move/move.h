@@ -6,10 +6,10 @@
 
 class Move {
     private:
-        DoubleMotor* axis_x_;
-        Motor* axis_y_;
+        Motor* axis_x_;
+        DoubleMotor* axis_y_;
     public:
-        Move(DoubleMotor* axis_x, Motor* axis_y);
+        Move(Motor* axis_x, DoubleMotor* axis_y);
 
         void run(long steps_x, long steps_y);
 };

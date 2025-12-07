@@ -2,7 +2,7 @@
 #include <./modules/motor/motor.h>
 #include <./modules/motor/double_motor.h>
 
-Move::Move(DoubleMotor* axis_x, Motor* axis_y) {
+Move::Move(Motor* axis_x, DoubleMotor* axis_y) {
     this->axis_x_ = axis_x;
     this->axis_y_ = axis_y;
 }
