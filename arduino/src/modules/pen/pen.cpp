@@ -2,23 +2,23 @@
 #include <./const/const.h>
 
 Pen::Pen(Motor* motor, Endstop* endstop) {
-    this->motor = motor;
-    this->endstop = endstop;
+    this->motor_ = motor;
+    this->endstop_ = endstop;
 }
 
-void Pen::write(bool write) {
+void Pen::write(bool write, uint8_t* step_delay) {
     if (write) {
-        motor->change_direction(HIGH);
-        motor->step_delay = &Const::STEP_DELAY_MOVING; // STEP_DELAY_WRITING
-        while (!endstop->is_pressed()) {
-            motor->step();
+        motor_->change_direction(HIGH);
+        step_delay = &Const::STEP_DELAY_MOVING;
+        while (!endstop_->is_pressed()) {
+            motor_->step();
         }
     } else {
-        motor->change_direction(LOW);
-        motor->step_delay = &Const::STEP_DELAY_MOVING;
-        while (endstop->is_pressed()) {
-            motor->step();
+        motor_->change_direction(LOW);
+        step_delay = &Const::STEP_DELAY_MOVING;
+        while (endstop_->is_pressed()) {
+            motor_->step();
         }
-        motor->run(1000);
+        motor_->run(1000);
     }
 }

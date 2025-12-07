@@ -7,34 +7,34 @@ DoubleMotor::DoubleMotor(
     DoubleEndstop* double_endstop,
     uint8_t* step_delay
 ) {
-    this->motor1 = motor1;
-    this->motor2 = motor2;
+    this->motor1_ = motor1;
+    this->motor2_ = motor2;
 
-    this->double_endstop = double_endstop;
-    this->step_delay = step_delay;
+    this->double_endstop_ = double_endstop;
+    this->step_delay_ = step_delay;
 }
 
 void DoubleMotor::setup() {
-    motor1->setup();
-    motor2->setup();
+    motor1_->setup();
+    motor2_->setup();
 }
 
 void DoubleMotor::change_direction(bool clockwise) {
-    motor1->change_direction(clockwise);
-    motor2->change_direction(!clockwise);
+    motor1_->change_direction(clockwise);
+    motor2_->change_direction(!clockwise);
 }
 
 void DoubleMotor::step() {
-    digitalWrite(motor1->step_pin, HIGH);
-    digitalWrite(motor2->step_pin, HIGH);
-    delayMicroseconds(*step_delay);
-    digitalWrite(motor1->step_pin, LOW);
-    digitalWrite(motor2->step_pin, LOW);
-    delayMicroseconds(*step_delay);
+    motor1_->step_raw(HIGH);
+    motor2_->step_raw(HIGH);
+    delayMicroseconds(*step_delay_);
+    motor1_->step_raw(LOW);
+    motor2_->step_raw(LOW);
+    delayMicroseconds(*step_delay_);
 }
 
 void DoubleMotor::calibrate() {
-    while (!double_endstop->is_pressed()) {
+    while (!double_endstop_->is_pressed()) {
         step();
     }
 }

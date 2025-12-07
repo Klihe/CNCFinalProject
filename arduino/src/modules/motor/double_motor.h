@@ -5,12 +5,13 @@
 #include <./modules/endstop/double_endstop.h>
 
 class DoubleMotor {
-    public:
-        Motor* motor1;
-        Motor* motor2;
-        DoubleEndstop* double_endstop;
-        uint8_t* step_delay;
+    private:
+        Motor* motor1_;
+        Motor* motor2_;
+        DoubleEndstop* double_endstop_;
+        uint8_t* step_delay_;
 
+    public:
         DoubleMotor(
             Motor* motor1,
             Motor* motor2,

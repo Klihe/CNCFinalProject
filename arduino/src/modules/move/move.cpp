@@ -3,16 +3,16 @@
 #include <./modules/motor/double_motor.h>
 
 Move::Move(DoubleMotor* axis_x, Motor* axis_y) {
-    this->axis_x = axis_x;
-    this->axis_y = axis_y;
+    this->axis_x_ = axis_x;
+    this->axis_y_ = axis_y;
 }
 
 void Move::run(long steps_x, long steps_y) {
-    if (steps_x > 0) axis_x->change_direction(HIGH);
-    else axis_x->change_direction(LOW);
+    if (steps_x > 0) axis_x_->change_direction(HIGH);
+    else axis_x_->change_direction(LOW);
 
-    if (steps_y > 0) axis_y->change_direction(HIGH);
-    else axis_y->change_direction(LOW);
+    if (steps_y > 0) axis_y_->change_direction(HIGH);
+    else axis_y_->change_direction(LOW);
 
     long dx = abs(steps_x), dy = abs(steps_y);
     long error = dx - dy;
@@ -24,14 +24,14 @@ void Move::run(long steps_x, long steps_y) {
             error -= dy;
             dx--;
 
-            axis_x->run(1);
+            axis_x_->run(1);
         }
 
         if (error < dx) {
             error += dx;
             dy--;
 
-            axis_y->run(1);
+            axis_y_->run(1);
         }
 
         if (dx == prev_dx && dy == prev_dy) {

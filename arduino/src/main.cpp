@@ -7,7 +7,7 @@
 #include <./modules/pen/pen.h>
 #include <./const/const.h>
 
-uint8_t step_delay = Const::STEP_DELAY_MOVING;
+uint8_t* step_delay = &Const::STEP_DELAY_MOVING;
 
 bool calibrated = false;
 bool writing = false;
@@ -21,12 +21,12 @@ Endstop endstop_pen(A2);
 
 DoubleEndstop double_endstop_x(&endstop_x1, &endstop_x2);
 
-Motor motor_x1(2, 3, 4, &endstop_x1, &step_delay);
-Motor motor_x2(11, 12, 13, &endstop_x2, &step_delay);
-Motor motor_y(5, 6, 7, &endstop_y, &step_delay);
-Motor motor_z(8, 9, 10, &endstop_z, &step_delay);
+Motor motor_x1(2, 3, 4, &endstop_x1, step_delay);
+Motor motor_x2(11, 12, 13, &endstop_x2, step_delay);
+Motor motor_y(5, 6, 7, &endstop_y, step_delay);
+Motor motor_z(8, 9, 10, &endstop_z, step_delay);
 
-DoubleMotor double_motor_x(&motor_x1, &motor_x2, &double_endstop_x, &step_delay);
+DoubleMotor double_motor_x(&motor_x1, &motor_x2, &double_endstop_x, step_delay);
 
 Move move(&double_motor_x, &motor_y);
 Pen pen(&motor_z, &endstop_z);
@@ -74,9 +74,9 @@ void calibrate() {
 void loop() {
   // --- Ensure motors are calibrated ---
   if (writing) {
-    step_delay = Const::STEP_DELAY_WRITING;
+    step_delay = &Const::STEP_DELAY_WRITING;
   } else {
-    step_delay = Const::STEP_DELAY_MOVING;
+    step_delay = &Const::STEP_DELAY_MOVING;
   }
   if (!calibrated) {
     calibrate();
@@ -89,9 +89,9 @@ void loop() {
 
     // Pen commands
     if (input == "PEN_DOWN") {
-      pen.write(HIGH);
+      pen.write(HIGH, step_delay);
     } else if (input == "PEN_UP") {
-      pen.write(LOW);
+      pen.write(LOW, step_delay);
     } else if (input == "NEXT_LINE") {
       double_motor_x.change_direction(HIGH);
       double_motor_x.run(Const::ONE_LINE_WIDTH);
