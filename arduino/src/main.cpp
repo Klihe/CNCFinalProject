@@ -52,8 +52,6 @@ void setup() {
 }
 
 void calibrate() {
-    if (calibrated) return;
-
     Serial.println("Calibrating axis z...");
     motor_z.change_direction(HIGH);
     motor_z.calibrate();
@@ -75,16 +73,9 @@ void calibrate() {
 }
 
 void loop() {
-  // --- Ensure motors are calibrated ---
-  if (writing) {
-    step_delay = &Const::STEP_DELAY_WRITING;
-  } else {
-    step_delay = &Const::STEP_DELAY_MOVING;
-  }
   if (!calibrated) {
     calibrate();
   }
-
   // --- Read serial commands ---
   if (Serial.available() > 0) {
     String input = Serial.readStringUntil('\n');
@@ -93,11 +84,13 @@ void loop() {
     // Pen commands
     if (input == "PEN_DOWN") {
       pen.write(HIGH, step_delay);
+      Serial.println("DONE");
     } else if (input == "PEN_UP") {
       pen.write(LOW, step_delay);
+      Serial.println("DONE");
     } else if (input == "NEXT_LINE") {
-      motor_x.run(state.x);
-      double_motor_y.run(Const::ONE_LINE_WIDTH);
+      move.run(-state.x, Const::ONE_LINE_WIDTH);
+      Serial.println("DONE");
     } else {
       // XY move command
       int commaIndex = input.indexOf(',');
@@ -106,6 +99,7 @@ void loop() {
         long x = input.substring(commaIndex + 1).toInt();
         move.run(x, y);
       }
+      Serial.println("DONE");
     }
   }
 }
