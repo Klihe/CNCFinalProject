@@ -5,10 +5,10 @@ class _Communication: # -> Const
 class _Slicing: # -> Const
     DISTANCE_THRESHOLD: float = 1e-4 # seconds per unit
     STEP_MULTIPLIER: int = 100
-    CHUNK_SIZE: int = 250
+    CHUNK_SIZE: int = 100
 
 class _Font: # -> Const
-    SCALE: float = 0.5
+    SCALE: float = 0.40
     SPACING: int = 0
     NAME: str = "futural"
 

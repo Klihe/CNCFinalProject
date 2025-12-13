@@ -4,9 +4,9 @@ uint32_t Const::BAUDRATE = 2000000;
 
 uint16_t Const::MAX_X = 64500;
 uint16_t Const::MAX_Y = 40000;
-uint16_t Const::ONE_LINE_WIDTH = 980;
-uint16_t Const::FIRST_LINE = 250;
+uint16_t Const::ONE_LINE_WIDTH = 660;
+uint16_t Const::FIRST_LINE = 1500;
 
 uint8_t Const::STEP_DELAY_WRITING = 25;
-uint8_t Const::STEP_DELAY_MOVING  = 13;
+uint8_t Const::STEP_DELAY_MOVING  = 25;
 
