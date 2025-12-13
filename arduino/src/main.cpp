@@ -16,7 +16,7 @@ bool calibrated = false;
 bool writing = false;
 
 // Command queue
-#define QUEUE_SIZE 10
+#define QUEUE_SIZE 20
 String commandQueue[QUEUE_SIZE];
 int queueHead = 0;  // Next position to write
 int queueTail = 0;  // Next position to read
