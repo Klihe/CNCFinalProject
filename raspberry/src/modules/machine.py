@@ -16,13 +16,21 @@ class Machine:
         pen_is_down = False
         last_pen_action_pos = (0, 0)
 
-        all_strokes = self.font.text_to_strokes(text)
-        for stroke in all_strokes:
+        all_strokes, first_pipe_count, text_stroke_count = self.font.text_to_strokes(text)
+
+        # Calculate indices for text section
+        text_start_idx = first_pipe_count
+        text_end_idx = text_start_idx + text_stroke_count
+
+        for i, stroke in enumerate(all_strokes):
             if len(stroke) < 1:
                 continue
 
             x0, y0 = stroke[0]
             dist_to_last = distance(last_pen_action_pos, (x0, y0))
+
+            # Determine if this stroke is part of the actual text (not pipes)
+            is_text_stroke = text_start_idx <= i < text_end_idx
 
             # --- PEN UP if needed ---
             if pen_is_down and dist_to_last > Const.SLICING.DISTANCE_THRESHOLD:
@@ -35,10 +43,13 @@ class Machine:
             self.commands.move(dx, dy)
             current_x, current_y = x0, y0
 
-            # --- PEN DOWN if needed ---
-            if not pen_is_down:
+            # --- PEN DOWN only for text strokes (not pipes) ---
+            if is_text_stroke and not pen_is_down:
                 self.commands.pen_down()
                 pen_is_down = True
+            elif not is_text_stroke and pen_is_down:
+                self.commands.pen_up()
+                pen_is_down = False
 
             last_pen_action_pos = (current_x, current_y)
 

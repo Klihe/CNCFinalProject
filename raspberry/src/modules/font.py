@@ -21,14 +21,23 @@ class Font:
     def change_font_spacing(self, font_spacing: float) -> None:
         self.font_spacing = font_spacing
 
-    def text_to_strokes(self, text: str) -> list:
-        lines = self._font.lines_for_text(text)
+    def text_to_strokes(self, text: str) -> tuple[list, int, int]:
+        """Returns (all_strokes, first_pipe_count, text_stroke_count)"""
+        lines = self._font.lines_for_text("|" + text + "|")
         all_strokes = []
         x_offset = 0
+
+        # Count strokes for each section
+        first_pipe_lines = list(self._font.lines_for_text("|"))
+        first_pipe_stroke_count = len([line for line in first_pipe_lines if line])
+
+        text_lines = list(self._font.lines_for_text(text))
+        text_stroke_count = len([line for line in text_lines if line])
+
         for line in lines:
             if line:
                 scaled_line = [(y * self._font_scale, -x * self._font_scale + x_offset) for x, y in line]
                 all_strokes.append(scaled_line)
                 x_offset += self._font_spacing * self._font_scale
 
-        return all_strokes
+        return all_strokes, first_pipe_stroke_count, text_stroke_count

@@ -5,8 +5,8 @@ machine = Machine("/dev/tty.usbserial-110")
 
 if __name__ == "__main__":
     time.sleep(8)
-    for _ in range(25):
-        machine.commands.next_line()
-    for _ in range(30):
-        machine.write_text("                                           |abcdefghijklmnopqrstuvwxyz|j")
-        machine.commands.next_line()
+
+    machine.commands.next_line()
+    text = "a" * 75
+    machine.write_text(text)
+    machine.commands.next_line()
