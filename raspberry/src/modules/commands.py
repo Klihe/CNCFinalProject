@@ -1,10 +1,7 @@
-import time
-from math import sqrt
 from typing import Literal
 
-from serial import Serial
-
 from const.const import Const
+from serial import Serial
 
 
 class Commands:
@@ -26,9 +23,10 @@ class Commands:
         self.serial_communication.write((command+"\n").encode())
         self.serial_communication.flush()
 
+        # Wait indefinitely for "DONE" response
         while True:
             line = self.serial_communication.readline().decode().strip()
-            if line == ("DONE"):
+            if line == "DONE":
                 break
 
     def pen_up(self) -> None:

@@ -15,6 +15,13 @@ uint8_t* step_delay = &Const::STEP_DELAY_MOVING;
 bool calibrated = false;
 bool writing = false;
 
+// Command queue
+#define QUEUE_SIZE 10
+String commandQueue[QUEUE_SIZE];
+int queueHead = 0;  // Next position to write
+int queueTail = 0;  // Next position to read
+int queueCount = 0; // Number of items in queue
+
 Endstop endstop_y1(A0);
 Endstop endstop_y2(A3);
 Endstop endstop_x(A1);
@@ -73,13 +80,33 @@ void calibrate() {
     calibrated = true;
 }
 
+void executeCommand(String input) {
+  // Pen commands
+  if (input == "PEN_DOWN") {
+    pen.write(HIGH, step_delay);
+  } else if (input == "PEN_UP") {
+    pen.write(LOW, step_delay);
+  } else if (input == "NEXT_LINE") {
+    move.run(-state.x, Const::ONE_LINE_WIDTH);
+  } else {
+    // XY move command
+    int commaIndex = input.indexOf(',');
+    if (commaIndex != -1) {
+      long y = input.substring(0, commaIndex).toInt();
+      long x = input.substring(commaIndex + 1).toInt();
+      move.run(x, y);
+    }
+  }
+}
+
 void loop() {
   if (!calibrated) {
     calibrate();
   }
-  // --- Read serial commands (non-blocking) ---
+  
+  // --- Read serial commands and add to queue (non-blocking) ---
   static String inputBuffer = "";
-  while (Serial.available() > 0) {
+  while (Serial.available() > 0 && queueCount < QUEUE_SIZE) {
     char c = Serial.read();
     if (c == '\r') continue;  // ignore carriage return
     if (c == '\n') {
@@ -89,29 +116,25 @@ void loop() {
       
       if (input.length() == 0) continue;
 
-      // Pen commands
-      if (input == "PEN_DOWN") {
-        pen.write(HIGH, step_delay);
-        Serial.println("DONE");
-      } else if (input == "PEN_UP") {
-        pen.write(LOW, step_delay);
-        Serial.println("DONE");
-      } else if (input == "NEXT_LINE") {
-        move.run(-state.x, Const::ONE_LINE_WIDTH);
-        Serial.println("DONE");
-      } else {
-        // XY move command
-        int commaIndex = input.indexOf(',');
-        if (commaIndex != -1) {
-          long y = input.substring(0, commaIndex).toInt();
-          long x = input.substring(commaIndex + 1).toInt();
-          move.run(x, y);
-        }
-        Serial.println("DONE");
-      }
+      // Add command to queue
+      commandQueue[queueHead] = input;
+      queueHead = (queueHead + 1) % QUEUE_SIZE;
+      queueCount++;
+      
+      // Send acknowledgment that command was queued
+      Serial.println("DONE");
     } else {
       inputBuffer += c;
-      if (inputBuffer.length() > 256) inputBuffer = "";  // protect against overflow
+      if (inputBuffer.length() > 1024) inputBuffer = "";  // protect against overflow
     }
+  }
+  
+  // --- Execute commands from queue ---
+  if (queueCount > 0) {
+    String cmd = commandQueue[queueTail];
+    queueTail = (queueTail + 1) % QUEUE_SIZE;
+    queueCount--;
+    
+    executeCommand(cmd);
   }
 }
