@@ -5,7 +5,7 @@ class _Communication: # -> Const
 class _Slicing: # -> Const
     DISTANCE_THRESHOLD: float = 1e-4 # seconds per unit
     STEP_MULTIPLIER: int = 100
-    CHUNK_SIZE: int = 2_000
+    CHUNK_SIZE: int = 250
 
 class _Font: # -> Const
     SCALE: float = 0.5

@@ -51,8 +51,8 @@ void Motor::run(uint16_t steps) {
     }
 
     if (direction_) {
-        *changing_var_ += (steps + 1);
+        *changing_var_ += steps;
     } else {
-        *changing_var_ -= (steps + 1);
+        *changing_var_ -= steps;
     }
 }

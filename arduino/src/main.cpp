@@ -36,6 +36,7 @@ Pen pen(&motor_z, &endstop_z);
 
 void setup() {
   Serial.begin(Const::BAUDRATE);
+  Serial.setTimeout(10);  // Prevent 1s blocking on readStringUntil
 
   Serial.println("Initializing motors...");
   double_motor_y.setup();
@@ -68,7 +69,7 @@ void calibrate() {
     double_motor_y.calibrate();
 
     Serial.println("Moving to left-upper conrner");
-    move.run(Const::MAX_X, 5000);
+    move.run(Const::MAX_X, Const::FIRST_LINE);
     calibrated = true;
 }
 
@@ -76,30 +77,41 @@ void loop() {
   if (!calibrated) {
     calibrate();
   }
-  // --- Read serial commands ---
-  if (Serial.available() > 0) {
-    String input = Serial.readStringUntil('\n');
-    input.trim();
+  // --- Read serial commands (non-blocking) ---
+  static String inputBuffer = "";
+  while (Serial.available() > 0) {
+    char c = Serial.read();
+    if (c == '\r') continue;  // ignore carriage return
+    if (c == '\n') {
+      String input = inputBuffer;
+      input.trim();
+      inputBuffer = "";
+      
+      if (input.length() == 0) continue;
 
-    // Pen commands
-    if (input == "PEN_DOWN") {
-      pen.write(HIGH, step_delay);
-      Serial.println("DONE");
-    } else if (input == "PEN_UP") {
-      pen.write(LOW, step_delay);
-      Serial.println("DONE");
-    } else if (input == "NEXT_LINE") {
-      move.run(-state.x, Const::ONE_LINE_WIDTH);
-      Serial.println("DONE");
-    } else {
-      // XY move command
-      int commaIndex = input.indexOf(',');
-      if (commaIndex != -1) {
-        long y = input.substring(0, commaIndex).toInt();
-        long x = input.substring(commaIndex + 1).toInt();
-        move.run(x, y);
+      // Pen commands
+      if (input == "PEN_DOWN") {
+        pen.write(HIGH, step_delay);
+        Serial.println("DONE");
+      } else if (input == "PEN_UP") {
+        pen.write(LOW, step_delay);
+        Serial.println("DONE");
+      } else if (input == "NEXT_LINE") {
+        move.run(-state.x, Const::ONE_LINE_WIDTH);
+        Serial.println("DONE");
+      } else {
+        // XY move command
+        int commaIndex = input.indexOf(',');
+        if (commaIndex != -1) {
+          long y = input.substring(0, commaIndex).toInt();
+          long x = input.substring(commaIndex + 1).toInt();
+          move.run(x, y);
+        }
+        Serial.println("DONE");
       }
-      Serial.println("DONE");
+    } else {
+      inputBuffer += c;
+      if (inputBuffer.length() > 256) inputBuffer = "";  // protect against overflow
     }
   }
 }
