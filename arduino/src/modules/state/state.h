@@ -11,6 +11,7 @@ class State {
         uint16_t z = 0;
 
         uint8_t currentLine = 0;
+        bool current_page = false;
 
         uint8_t* step_delay = &Const::STEP_DELAY_MOVING;
 

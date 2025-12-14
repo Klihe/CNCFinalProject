@@ -17,7 +17,7 @@ class _Commands: # -> Const
     PEN_UP: str = "PEN_UP"
     PEN_DOWN: str = "PEN_DOWN"
     CHUNK: str = "{chunk_dx}, {chunk_dy}"
-    NEW_PAGE: str = "{page}_PAGE"
+    NEW_PAGE: str = "NEXT_PAGE"
     NEXT_LINE: str = "NEXT_LINE"
 
 class Const:

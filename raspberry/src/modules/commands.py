@@ -1,5 +1,3 @@
-from typing import Literal
-
 from const.const import Const
 from serial import Serial
 
@@ -45,14 +43,8 @@ class Commands:
             dx -= chunk_dx
             dy -= chunk_dy
 
-    def new_page(self, page: Literal["LEFT", "RIGHT"]) -> None:
-        # distance = ???
-        # self._base_command(
-        #     self.NEW_PAGE.format(page),
-        #     distance
-        # )
-        ...
+    def next_page(self) -> None:
+        self._base_command(self.NEW_PAGE)
 
     def next_line(self) -> None:
-        # distance = ???
         self._base_command(self.NEXT_LINE)

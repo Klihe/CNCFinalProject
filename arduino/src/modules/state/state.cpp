@@ -2,4 +2,5 @@
 
 State::State() {
 	currentLine = 0;
+    current_page = false;
 };

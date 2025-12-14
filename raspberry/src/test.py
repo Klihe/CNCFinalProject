@@ -5,10 +5,8 @@ from modules.font import Text
 machine = Machine("/dev/tty.usbserial-110")
 
 if __name__ == "__main__":
-    time.sleep(8)
+    time.sleep(15)
 
-    machine.write_text("i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i i")
-    machine.commands.next_line()
-
-    # font = Font()
-    # font.text_to_strokes("ahoj ahoj ahoj")
+    while True:
+        machine.commands.next_page()
+        time.sleep(5)

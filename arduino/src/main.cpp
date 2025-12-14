@@ -13,7 +13,6 @@ State state{};
 uint8_t* step_delay = &Const::STEP_DELAY_MOVING;
 
 bool calibrated = false;
-bool writing = false;
 
 // Command queue
 #define QUEUE_SIZE 20
@@ -59,58 +58,32 @@ void setup() {
   Serial.println("Setup complete...");
 }
 
-void calibrate() {
-    Serial.println("Calibrating axis z...");
-    motor_z.change_direction(HIGH);
-    motor_z.calibrate();
-
-    motor_z.change_direction(LOW);
-    motor_z.run(5000);
-
-    Serial.println("Calibrating axis y...");
-    motor_x.change_direction(LOW);
-    motor_x.calibrate();
-
-    Serial.println("Calibrating axis x...");
-    double_motor_y.change_direction(LOW);
-    double_motor_y.calibrate();
-
-    Serial.println("Moving to left-upper conrner");
-    move.run(Const::MAX_X, Const::FIRST_LINE);
-    Serial.print("After calibration - state.y: ");
-    Serial.print(state.y);
-    Serial.print(", state.x: ");
-    Serial.println(state.x);
-
-    state.currentLine = 0;
-    calibrated = true;
-}
-
 void next_page() {
-    Serial.println("Calibrating axis z...");
-    motor_z.change_direction(HIGH);
-    motor_z.calibrate();
+  state.current_page = !state.current_page;
 
-    motor_z.change_direction(LOW);
-    motor_z.run(5000);
+  motor_z.change_direction(HIGH);
+  motor_z.calibrate();
 
-    Serial.println("Calibrating axis y...");
-    motor_x.change_direction(LOW);
-    motor_x.calibrate();
+  motor_z.change_direction(LOW);
+  motor_z.run(5000);
 
-    Serial.println("Calibrating axis x...");
-    double_motor_y.change_direction(LOW);
-    double_motor_y.calibrate();
+  motor_x.change_direction(LOW);
+  motor_x.calibrate();
 
-    Serial.println("Moving to left-upper conrner");
-    move.run(Const::MAX_X, Const::FIRST_LINE);
-    Serial.print("After calibration - state.y: ");
-    Serial.print(state.y);
-    Serial.print(", state.x: ");
-    Serial.println(state.x);
+  double_motor_y.change_direction(LOW);
+  double_motor_y.calibrate();
 
-    state.currentLine = 0;
-    calibrated = true;
+  if (state.current_page) {
+    move.run(Const::PAGE_ONE, Const::FIRST_LINE);
+  } else {
+    move.run(Const::PAGE_TWO, Const::FIRST_LINE);
+  }
+
+  Serial.print(state.y);
+  Serial.println(state.x);
+
+  state.currentLine = 0;
+  calibrated = true;
 }
 
 void executeCommand(String input) {
@@ -137,6 +110,8 @@ void executeCommand(String input) {
     
     Serial.print(state.y);
     Serial.println(state.x);
+  } else if (input == "NEXT_PAGE") {
+    next_page();
   } else {
     int commaIndex = input.indexOf(',');
     if (commaIndex != -1) {
@@ -149,7 +124,7 @@ void executeCommand(String input) {
 
 void loop() {
   if (!calibrated) {
-    calibrate();
+    next_page();
   }
   
   static String inputBuffer = "";
