@@ -6,6 +6,7 @@ class _Slicing: # -> Const
     DISTANCE_THRESHOLD: float = 1e-4 # seconds per unit
     STEP_MULTIPLIER: int = 100
     CHUNK_SIZE: int = 100
+    LINE_WIDTH: float = 225
 
 class _Font: # -> Const
     SCALE: float = 0.40

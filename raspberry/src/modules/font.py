@@ -1,42 +1,71 @@
 from HersheyFonts import HersheyFonts
 
 from const.const import Const
+import re
 
-
-class Font:
+class Font(HersheyFonts):
     def __init__(self) -> None:
-        self._font_name: str = Const.FONT.NAME
-        self._font_scale: float = Const.FONT.SCALE
-        self._font_spacing: float = Const.FONT.SPACING
+        super().__init__()
+        self.load_default_font(Const.FONT.NAME)
 
-        self._font = HersheyFonts()
-        self._font.load_default_font(self._font_name)
+class Line:
+    def __init__(self, font: Font):
+        self.font = font
+        self.width = 0
+        self.text = ""
 
-    def change_font_name(self, font_name: str) -> None:
-        self._font_name = font_name
+    def add_word(self, word: str) -> bool:
+        word_width = self._word_width(word)
+        if word_width + self.width > Const.SLICING.LINE_WIDTH:
+            return False
 
-    def change_font_scale(self, font_scale: float) -> None:
-        self._font_scale = font_scale
+        self.width += word_width
+        self.text += word
 
-    def change_font_spacing(self, font_spacing: float) -> None:
-        self.font_spacing = font_spacing
+        return True
 
-    def text_to_strokes(self, text: str) -> tuple[list, int, int]:
-        lines = self._font.lines_for_text("|" + text + "j")
-        all_strokes = []
-        x_offset = 0
+    def _word_width(self, word) -> float:
+        if not word:
+            return 0.0
 
-        # Count strokes for each section
-        first_pipe_lines = list(self._font.lines_for_text("|"))
-        first_pipe_stroke_count = len([line for line in first_pipe_lines if line])
+        lines = self.font.lines_for_text(word)
 
-        text_lines = list(self._font.lines_for_text(text))
-        text_stroke_count = len([line for line in text_lines if line])
+        max_x = float("-inf")
+        min_x = float("inf")
+
+        strokes = []
 
         for line in lines:
-            if line:
-                scaled_line = [(y * self._font_scale, -x * self._font_scale + x_offset) for x, y in line]
-                all_strokes.append(scaled_line)
-                x_offset += self._font_spacing * self._font_scale
+            scaled_line = [(y * Const.FONT.SCALE, -x * Const.FONT.SCALE) for x, y in line]
+            strokes.append(scaled_line)
 
-        return all_strokes, first_pipe_stroke_count, text_stroke_count
+        for stroke in strokes:
+            for _, x in stroke:
+                max_x = max(max_x, x)
+                min_x = min(min_x, x)
+
+        return (max_x - min_x) if max_x != float("-inf") else 0.0
+
+class Text:
+    def __init__(self) -> None:
+        self.font = Font()
+
+    def text_to_strokes(self, text: str) -> list[Line]:
+        start_char = "|"
+        end_char = "j"
+
+        words: list[str] = re.findall(r"\S+\s*", text)
+        words.insert(0, start_char)
+        words.append(end_char)
+
+        lines = [Line(self.font)]
+        index = 0
+
+        for word in words:
+            if lines[index].add_word(word):
+                continue
+            index += 1
+            lines.append(Line(self.font))
+            lines[index].add_word(word)
+
+        return lines
