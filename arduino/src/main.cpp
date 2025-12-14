@@ -87,26 +87,22 @@ void next_page() {
 }
 
 void executeCommand(String input) {
-  // Pen commands
   if (input == "PEN_DOWN") {
     pen.write(HIGH, step_delay);
   } else if (input == "PEN_UP") {
     pen.write(LOW, step_delay);
   } else if (input == "NEXT_LINE") {
-    Serial.print(state.currentLine);
-    Serial.print(state.y);
-    Serial.println(state.x);
-    
+
     state.currentLine = state.currentLine + 1;
     
     long targetY = (long)Const::FIRST_LINE + (long)Const::ONE_LINE_WIDTH * (long)state.currentLine;
     long deltaY = targetY - (long)state.y;
-    
-    Serial.print(state.currentLine);
-    Serial.print(targetY);
-    Serial.println(deltaY);
 
-    move.run(-state.x, deltaY);
+    if (state.current_page) {
+      move.run(-state.x, deltaY);
+    } else {
+      move.run(30964-state.x, deltaY);
+    }
     
     Serial.print(state.y);
     Serial.println(state.x);

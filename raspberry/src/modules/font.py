@@ -70,4 +70,6 @@ class Text:
             lines.append(Line(self.font))
             lines[index].add_word(word)
 
+        lines[index].end_line(start_char, end_char)
+
         return lines, start_char_number_of_strokes, end_char_number_of_strokes
