@@ -20,14 +20,14 @@ void Move::run(long steps_x, long steps_y) {
     while (dx > 0 || dy > 0) {
         long prev_dx = dx, prev_dy = dy;
 
-        if (error > -dy) {
+        if (error > -dy && dx > 0) {
             error -= dy;
             dx--;
 
             axis_x_->run(1);
         }
 
-        if (error < dx) {
+        if (error <= 0 && dy > 0) {
             error += dx;
             dy--;
 

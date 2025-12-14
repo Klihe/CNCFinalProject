@@ -43,7 +43,7 @@ Pen pen(&motor_z, &endstop_z);
 
 void setup() {
   Serial.begin(Const::BAUDRATE);
-  Serial.setTimeout(10);  // Prevent 1s blocking on readStringUntil
+  Serial.setTimeout(10);
 
   Serial.println("Initializing motors...");
   double_motor_y.setup();
@@ -77,6 +77,12 @@ void calibrate() {
 
     Serial.println("Moving to left-upper conrner");
     move.run(Const::MAX_X, Const::FIRST_LINE);
+    Serial.print("After calibration - state.y: ");
+    Serial.print(state.y);
+    Serial.print(", state.x: ");
+    Serial.println(state.x);
+
+    state.currentLine = 0;
     calibrated = true;
 }
 
@@ -87,9 +93,24 @@ void executeCommand(String input) {
   } else if (input == "PEN_UP") {
     pen.write(LOW, step_delay);
   } else if (input == "NEXT_LINE") {
-    move.run(-state.x, Const::ONE_LINE_WIDTH);
+    Serial.print(state.currentLine);
+    Serial.print(state.y);
+    Serial.println(state.x);
+    
+    state.currentLine = state.currentLine + 1;
+    
+    long targetY = (long)Const::FIRST_LINE + (long)Const::ONE_LINE_WIDTH * (long)state.currentLine;
+    long deltaY = targetY - (long)state.y;
+    
+    Serial.print(state.currentLine);
+    Serial.print(targetY);
+    Serial.println(deltaY);
+
+    move.run(-state.x, deltaY);
+    
+    Serial.print(state.y);
+    Serial.println(state.x);
   } else {
-    // XY move command
     int commaIndex = input.indexOf(',');
     if (commaIndex != -1) {
       long y = input.substring(0, commaIndex).toInt();
@@ -104,11 +125,10 @@ void loop() {
     calibrate();
   }
   
-  // --- Read serial commands and add to queue (non-blocking) ---
   static String inputBuffer = "";
   while (Serial.available() > 0 && queueCount < QUEUE_SIZE) {
     char c = Serial.read();
-    if (c == '\r') continue;  // ignore carriage return
+    if (c == '\r') continue;
     if (c == '\n') {
       String input = inputBuffer;
       input.trim();
@@ -116,20 +136,17 @@ void loop() {
       
       if (input.length() == 0) continue;
 
-      // Add command to queue
       commandQueue[queueHead] = input;
       queueHead = (queueHead + 1) % QUEUE_SIZE;
       queueCount++;
       
-      // Send acknowledgment that command was queued
       Serial.println("DONE");
     } else {
       inputBuffer += c;
-      if (inputBuffer.length() > 1024) inputBuffer = "";  // protect against overflow
+      if (inputBuffer.length() > 1024) inputBuffer = "";
     }
   }
   
-  // --- Execute commands from queue ---
   if (queueCount > 0) {
     String cmd = commandQueue[queueTail];
     queueTail = (queueTail + 1) % QUEUE_SIZE;

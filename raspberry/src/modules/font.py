@@ -22,8 +22,7 @@ class Font:
         self.font_spacing = font_spacing
 
     def text_to_strokes(self, text: str) -> tuple[list, int, int]:
-        """Returns (all_strokes, first_pipe_count, text_stroke_count)"""
-        lines = self._font.lines_for_text("|" + text + "|")
+        lines = self._font.lines_for_text("|" + text + "j")
         all_strokes = []
         x_offset = 0
 

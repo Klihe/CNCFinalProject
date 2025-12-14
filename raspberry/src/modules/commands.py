@@ -23,7 +23,6 @@ class Commands:
         self.serial_communication.write((command+"\n").encode())
         self.serial_communication.flush()
 
-        # Wait indefinitely for "DONE" response
         while True:
             line = self.serial_communication.readline().decode().strip()
             if line == "DONE":
