@@ -11,24 +11,24 @@ class Font(HersheyFonts):
 class Line:
     def __init__(self, font: Font):
         self.font = font
-        self.width = 0
         self.text = ""
 
     def add_word(self, word: str) -> bool:
-        word_width = self._word_width(word)
-        if word_width + self.width > Const.SLICING.LINE_WIDTH:
+        text_width = self._text_width(self.text + word)
+        if text_width > Const.SLICING.LINE_WIDTH:
             return False
 
-        self.width += word_width
         self.text += word
-
         return True
 
-    def _word_width(self, word) -> float:
-        if not word:
+    def end_line(self, start_char, end_char) -> None:
+        self.text = start_char + self.text + end_char
+
+    def _text_width(self, text) -> float:
+        if not text:
             return 0.0
 
-        lines = self.font.lines_for_text(word)
+        lines = self.font.lines_for_text(text)
 
         max_x = float("-inf")
         min_x = float("inf")
@@ -50,13 +50,14 @@ class Text:
     def __init__(self) -> None:
         self.font = Font()
 
-    def text_to_strokes(self, text: str) -> list[Line]:
+    def text_to_strokes(self, text: str) -> tuple[list[Line], int, int]:
         start_char = "|"
         end_char = "j"
 
+        start_char_number_of_strokes = len(list(self.font.lines_for_text(start_char)))
+        end_char_number_of_strokes = len(list(self.font.lines_for_text(end_char)))
+
         words: list[str] = re.findall(r"\S+\s*", text)
-        words.insert(0, start_char)
-        words.append(end_char)
 
         lines = [Line(self.font)]
         index = 0
@@ -64,8 +65,9 @@ class Text:
         for word in words:
             if lines[index].add_word(word):
                 continue
+            lines[index].end_line(start_char, end_char)
             index += 1
             lines.append(Line(self.font))
             lines[index].add_word(word)
 
-        return lines
+        return lines, start_char_number_of_strokes, end_char_number_of_strokes

@@ -86,6 +86,33 @@ void calibrate() {
     calibrated = true;
 }
 
+void next_page() {
+    Serial.println("Calibrating axis z...");
+    motor_z.change_direction(HIGH);
+    motor_z.calibrate();
+
+    motor_z.change_direction(LOW);
+    motor_z.run(5000);
+
+    Serial.println("Calibrating axis y...");
+    motor_x.change_direction(LOW);
+    motor_x.calibrate();
+
+    Serial.println("Calibrating axis x...");
+    double_motor_y.change_direction(LOW);
+    double_motor_y.calibrate();
+
+    Serial.println("Moving to left-upper conrner");
+    move.run(Const::MAX_X, Const::FIRST_LINE);
+    Serial.print("After calibration - state.y: ");
+    Serial.print(state.y);
+    Serial.print(", state.x: ");
+    Serial.println(state.x);
+
+    state.currentLine = 0;
+    calibrated = true;
+}
+
 void executeCommand(String input) {
   // Pen commands
   if (input == "PEN_DOWN") {

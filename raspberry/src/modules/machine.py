@@ -11,13 +11,13 @@ class Machine:
 
     def write_text(self, text: str) -> None:
         # Get lines (Font.Line objects) from font
-        lines = self.text.text_to_strokes(text)
+        lines, start_char_strokes, end_char_strokes = self.text.text_to_strokes(text)
 
         # Write each line
         for line in lines:
-            self._write_line(line)
+            self._write_line(line, start_char_strokes, end_char_strokes)
 
-    def _write_line(self, line) -> None:
+    def _write_line(self, line, start_char_strokes: int, end_char_strokes: int) -> None:
         # Compute scaled strokes for the entire line text
         raw_lines = line.font.lines_for_text(line.text)
         strokes = []
@@ -32,9 +32,12 @@ class Machine:
         pen_is_down = False
         last_pen_action_pos = (0, 0)
 
-        for stroke in strokes:
+        for stroke_idx, stroke in enumerate(strokes):
             if len(stroke) < 1:
                 continue
+
+            # Determine if this stroke is a calibration character (start or end)
+            is_calibration = (stroke_idx < start_char_strokes or stroke_idx >= len(strokes) - end_char_strokes)
 
             x0, y0 = stroke[0]
             dist_to_last = distance(last_pen_action_pos, (x0, y0))
@@ -50,10 +53,13 @@ class Machine:
             self.commands.move(dx, dy)
             current_x, current_y = x0, y0
 
-            # PEN DOWN to draw
-            if not pen_is_down:
+            # PEN DOWN to draw (skip for calibration characters)
+            if not is_calibration and not pen_is_down:
                 self.commands.pen_down()
                 pen_is_down = True
+            elif is_calibration and pen_is_down:
+                self.commands.pen_up()
+                pen_is_down = False
 
             last_pen_action_pos = (current_x, current_y)
 
