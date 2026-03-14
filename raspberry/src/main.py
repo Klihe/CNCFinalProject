@@ -20,15 +20,18 @@ with col1:
     page1 = st.text_area("Page 1", height=720, key="page1")
 with col2:
     page2 = st.text_area("Page 2", height=720, key="page2")
-text_input = page1 + page2
-
-
 if st.button("Draw"):
-    if not text_input:
+    if not page1 and not page2:
         logger.warning("Draw clicked with empty input")
         st.warning("Enter some text!")
     else:
-        logger.info(f"Draw requested: {text_input!r}")
-        machine.write_text(text_input)
+        if page1:
+            logger.info(f"Drawing page 1: {page1!r}")
+            machine.write_text(page1)
+        if page2:
+            logger.info("Advancing to page 2")
+            machine.commands.next_page()
+            logger.info(f"Drawing page 2: {page2!r}")
+            machine.write_text(page2)
         logger.success("Drawing finished")
         st.success("Drawing finished!")
