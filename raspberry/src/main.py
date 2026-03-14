@@ -7,7 +7,7 @@ from modules.machine import Machine
 
 if "machine" not in st.session_state:
     logger.info("First run — creating Machine instance")
-    st.session_state.machine = Machine("/dev/tty.usbserial-110")
+    st.session_state.machine = Machine()
     logger.info("Waiting 8s for Arduino to boot")
     time.sleep(8)
     logger.success("Machine initialized and ready")
