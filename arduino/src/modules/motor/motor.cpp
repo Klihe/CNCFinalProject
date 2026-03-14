@@ -43,6 +43,7 @@ void Motor::calibrate() {
     while (!endstop_->is_pressed()) {
         step_();
     }
+    *changing_var_ = 0;
 }
 
 void Motor::run(uint16_t steps) {
