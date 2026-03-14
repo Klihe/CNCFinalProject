@@ -1,12 +1,15 @@
-from HersheyFonts import HersheyFonts
-
-from const.const import Const
 import re
+
+from HersheyFonts import HersheyFonts
+from loguru import logger
+from const.const import Const
 
 class Font(HersheyFonts):
     def __init__(self) -> None:
         super().__init__()
+        logger.info(f"Loading font: {Const.FONT.NAME!r}")
         self.load_default_font(Const.FONT.NAME)
+        logger.success(f"Font {Const.FONT.NAME!r} loaded")
 
 class Line:
     def __init__(self, font: Font):
@@ -16,12 +19,15 @@ class Line:
     def add_word(self, word: str) -> bool:
         text_width = self._text_width(self.text + word)
         if text_width > Const.SLICING.LINE_WIDTH:
+            logger.debug(f"Word {word!r} does not fit (width={text_width:.1f} > {Const.SLICING.LINE_WIDTH}), starting new line")
             return False
 
         self.text += word
+        logger.debug(f"Added word {word!r}, line width now {text_width:.1f}/{Const.SLICING.LINE_WIDTH}")
         return True
 
     def end_line(self, start_char, end_char) -> None:
+        logger.debug(f"Closing line: {self.text!r}")
         self.text = start_char + self.text + end_char
 
     def _text_width(self, text) -> float:
@@ -48,16 +54,20 @@ class Line:
 
 class Text:
     def __init__(self) -> None:
+        logger.info("Initializing Text renderer")
         self.font = Font()
 
     def text_to_strokes(self, text: str) -> tuple[list[Line], int, int]:
+        logger.info(f"Converting text to strokes ({len(text)} chars)")
         start_char = "|"
         end_char = "j"
 
         start_char_number_of_strokes = len(list(self.font.lines_for_text(start_char)))
         end_char_number_of_strokes = len(list(self.font.lines_for_text(end_char)))
+        logger.debug(f"Calibration strokes: start={start_char_number_of_strokes}, end={end_char_number_of_strokes}")
 
-        words: list[str] = re.findall(r"\S+\s*", text)
+        words: list[str] = re.findall(r"\s+|\S+", text)
+        logger.debug(f"Found {len(words)} tokens (words + whitespace)")
 
         lines = [Line(self.font)]
         index = 0
@@ -72,4 +82,5 @@ class Text:
 
         lines[index].end_line(start_char, end_char)
 
+        logger.info(f"Text split into {len(lines)} lines")
         return lines, start_char_number_of_strokes, end_char_number_of_strokes

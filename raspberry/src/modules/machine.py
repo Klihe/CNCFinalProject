@@ -1,3 +1,5 @@
+from loguru import logger
+
 from const.const import Const
 from modules.commands import Commands
 from modules.font import Text
@@ -6,15 +8,26 @@ from modules.helpers import distance
 
 class Machine:
     def __init__(self, port: None | str = None) -> None:
+        logger.info("Initializing machine")
         self.commands = Commands(port)
         self.text = Text()
+        logger.success("Machine ready")
 
     def write_text(self, text: str) -> None:
-        # Get lines (Font.Line objects) from font
+        logger.info(f"Writing text ({len(text)} chars)")
         lines, start_char_strokes, end_char_strokes = self.text.text_to_strokes(text)
+        logger.info(f"Text split into {len(lines)} lines")
 
-        # Write each line
-        for line in lines:
+        for line_idx, line in enumerate(lines):
+            if line_idx >= 60:
+                logger.warning("Reached 60-line limit, stopping")
+                break
+
+            if line_idx > 0 and line_idx % 30 == 0:
+                logger.info(f"Page break at line {line_idx}")
+                self.commands.next_page()
+
+            logger.debug(f"Writing line {line_idx + 1}/{len(lines)}: {line.text!r}")
             self._write_line(line, start_char_strokes, end_char_strokes)
 
     def _write_line(self, line, start_char_strokes: int, end_char_strokes: int) -> None:

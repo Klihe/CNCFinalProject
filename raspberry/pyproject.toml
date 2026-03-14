@@ -9,6 +9,7 @@ dependencies = [
     "matplotlib>=3.10.6",
     "pyserial>=3.5",
     "setuptools>=80.9.0",
+    "loguru>=0.7.0",
     "streamlit>=1.50.0",
     "svgpathtools>=1.7.1",
 ]
