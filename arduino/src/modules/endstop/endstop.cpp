@@ -1,13 +1,13 @@
 #include "./modules/endstop/endstop.h"
 
 Endstop::Endstop(uint8_t pin) {
-    this->pin = pin;
+    this->pin_ = pin;
 }
 
 void Endstop::setup() {
-    pinMode(pin, INPUT);
+    pinMode(pin_, INPUT);
 }
 
 bool Endstop::is_pressed() {
-    return digitalRead(pin);
+    return digitalRead(pin_);
 }

@@ -4,13 +4,14 @@
 #include <Arduino.h>
 
 class Endstop {
+    private:
+        uint8_t pin_;
+
     public:
-        uint8_t pin;
+        Endstop(uint8_t pin);
 
-    Endstop(uint8_t pin);
-
-    void setup();
-    bool is_pressed();
+        void setup();
+        bool is_pressed();
 };
 
 #endif

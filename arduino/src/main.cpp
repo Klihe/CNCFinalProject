@@ -8,10 +8,11 @@
 #include <./const/const.h>
 #include <./modules/commands/commands.h>
 
-uint8_t step_delay = Const::STEP_DELAY_MOVING;
+State state{};
+
+uint8_t* step_delay = &Const::STEP_DELAY_MOVING;
 
 bool calibrated = false;
-bool writing = false;
 
 String command = "";
 Commands commands(&command);
@@ -23,61 +24,67 @@ Endstop endstop_z(A2);
 
 Endstop endstop_pen(A2);
 
-DoubleEndstop double_endstop_x(&endstop_x1, &endstop_x2);
+DoubleEndstop double_endstop_y(&endstop_y1, &endstop_y2);
 
-Motor motor_x1(2, 3, 4, &endstop_x1, &step_delay);
-Motor motor_x2(11, 12, 13, &endstop_x2, &step_delay);
-Motor motor_y(5, 6, 7, &endstop_y, &step_delay);
-Motor motor_z(8, 9, 10, &endstop_z, &step_delay);
+Motor motor_y1(2, 3, 4, &endstop_y1, state.step_delay, &state.y);
+Motor motor_y2(11, 12, 13, &endstop_y2, state.step_delay, &state.y);
+Motor motor_x(5, 6, 7, &endstop_x, state.step_delay, &state.x);
+Motor motor_z(8, 9, 10, &endstop_z, state.step_delay, &state.z);
 
-DoubleMotor double_motor_x(&motor_x1, &motor_x2, &double_endstop_x, &step_delay);
+DoubleMotor double_motor_y(&motor_y1, &motor_y2, &double_endstop_y, state.step_delay, &state.y);
 
-Move move(&double_motor_x, &motor_y);
+Move move(&motor_x, &double_motor_y);
 Pen pen(&motor_z, &endstop_z);
 
 void setup() {
   Serial.begin(Const::BAUDRATE);
+  Serial.setTimeout(10);
 
   Serial.println("Initializing motors...");
-  double_motor_x.setup();
-  motor_y.setup();
+  double_motor_y.setup();
+  motor_x.setup();
   motor_z.setup();
 
   Serial.println("Initializing endstops...");
-  double_endstop_x.setup();
-  endstop_y.setup();
+  double_endstop_y.setup();
+  endstop_x.setup();
   endstop_z.setup();
   endstop_pen.setup();
 
   Serial.println("Setup complete...");
 }
 
-void calibrate() {
-    if (calibrated) return;
+void next_page() {
+  state.current_page = !state.current_page;
 
-    Serial.println("Calibrating axis z...");
-    motor_z.change_direction(HIGH);
-    motor_z.calibrate();
+  motor_z.change_direction(HIGH);
+  motor_z.calibrate();
 
-    motor_z.change_direction(LOW);
-    motor_z.run(5000);
+  motor_z.change_direction(LOW);
+  motor_z.run(5000);
 
-    Serial.println("Calibrating axis y...");
-    motor_y.change_direction(LOW);
-    motor_y.calibrate();
+  motor_x.change_direction(LOW);
+  motor_x.calibrate();
 
-    Serial.println("Calibrating axis x...");
-    double_motor_x.change_direction(LOW);
-    double_motor_x.calibrate();
+  double_motor_y.change_direction(LOW);
+  double_motor_y.calibrate();
 
-    Serial.println("Moving to left-upper conrner");
-    move.run(1000, Const::MAX_X);
-    calibrated = true;
+  if (state.current_page) {
+    move.run(Const::PAGE_ONE, Const::FIRST_LINE);
+  } else {
+    move.run(Const::PAGE_TWO, Const::FIRST_LINE);
+  }
+
+  Serial.print(state.y);
+  Serial.println(state.x);
+
+  state.currentLine = 0;
+  calibrated = true;
 }
 
 void loop() {
   if (!calibrated) {
-    calibrate();
+    next_page();
   }
 
   if (command == Const::COMMAND_PEN_DOWN) {
@@ -94,5 +101,13 @@ void loop() {
         long y = command.substring(comma_index + 1).toInt();
         move.run(x, y);
     }
+  }
+  
+  if (queueCount > 0) {
+    String cmd = commandQueue[queueTail];
+    queueTail = (queueTail + 1) % QUEUE_SIZE;
+    queueCount--;
+    
+    executeCommand(cmd);
   }
 }

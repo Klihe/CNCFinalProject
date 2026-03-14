@@ -5,11 +5,11 @@
 #include <./modules/motor/double_motor.h>
 
 class Move {
+    private:
+        Motor* axis_x_;
+        DoubleMotor* axis_y_;
     public:
-        DoubleMotor* axis_x;
-        Motor* axis_y;
-
-        Move(DoubleMotor* axis_x, Motor* axis_y);
+        Move(Motor* axis_x, DoubleMotor* axis_y);
 
         void run(long steps_x, long steps_y);
 };

@@ -12,7 +12,7 @@ void DoubleEndstop::setup() {
 }
 
 bool DoubleEndstop::is_pressed() {
-    if (digitalRead(endstop1->pin) && digitalRead(endstop2->pin)) {
+    if (endstop1->is_pressed() && endstop2->is_pressed()) {
         return HIGH;
     }
 
