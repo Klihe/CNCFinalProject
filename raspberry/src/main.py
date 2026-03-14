@@ -14,8 +14,8 @@ if "machine" not in st.session_state:
 
 machine = st.session_state.machine
 
-st.title("Text to Arduino Drawing with Visualization")
-text_input = st.text_area("Enter text to draw:", "HELLO")
+st.title("CNC Plotter")
+text_input = st.text_area("", placeholder="Enter text to draw.", label_visibility="collapsed")
 
 if st.button("Draw"):
     if not text_input:
