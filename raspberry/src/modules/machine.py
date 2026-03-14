@@ -14,32 +14,8 @@ class Machine:
         logger.success("Machine ready")
 
     def write_text(self, text: str) -> None:
-        logger.info(f"Writing text ({len(text)} chars)")
-        lines, start_char_strokes, end_char_strokes = self.text.text_to_strokes(text)
-        logger.info(f"Text split into {len(lines)} lines")
-
-        for line_idx, line in enumerate(lines):
-            if line_idx >= 60:
-                logger.warning("Reached 60-line limit, stopping")
-                break
-
-            if line_idx > 0 and line_idx % 30 == 0:
-                logger.info(f"Page break at line {line_idx}")
-                self.commands.next_page()
-
-            logger.debug(f"Writing line {line_idx + 1}/{len(lines)}: {line.text!r}")
-            self._write_line(line, start_char_strokes, end_char_strokes)
-
-    def _write_line(self, line, start_char_strokes: int, end_char_strokes: int) -> None:
-        # Compute scaled strokes for the entire line text
-        raw_lines = line.font.lines_for_text(line.text)
-        strokes = []
-        for raw in raw_lines:
-            if raw:
-                scaled = [(y * Const.FONT.SCALE, -x * Const.FONT.SCALE) for x, y in raw]
-                strokes.append(scaled)
-
-        # Draw all strokes
+        print("writing")
+        # --- Draw all strokes ---
         self.commands.pen_up()
         current_x, current_y = 0, 0
         pen_is_down = False

@@ -6,7 +6,7 @@
 #include <./modules/move/move.h>
 #include <./modules/pen/pen.h>
 #include <./const/const.h>
-#include <./modules/state/state.h>
+#include <./modules/commands/commands.h>
 
 State state{};
 
@@ -14,16 +14,12 @@ uint8_t* step_delay = &Const::STEP_DELAY_MOVING;
 
 bool calibrated = false;
 
-// Command queue
-#define QUEUE_SIZE 20
-String commandQueue[QUEUE_SIZE];
-int queueHead = 0;  // Next position to write
-int queueTail = 0;  // Next position to read
-int queueCount = 0; // Number of items in queue
+String command = "";
+Commands commands(&command);
 
-Endstop endstop_y1(A0);
-Endstop endstop_y2(A3);
-Endstop endstop_x(A1);
+Endstop endstop_x1(A0);
+Endstop endstop_x2(A3);
+Endstop endstop_y(A1);
 Endstop endstop_z(A2);
 
 Endstop endstop_pen(A2);
@@ -86,62 +82,24 @@ void next_page() {
   calibrated = true;
 }
 
-void executeCommand(String input) {
-  if (input == "PEN_DOWN") {
-    pen.write(HIGH, step_delay);
-  } else if (input == "PEN_UP") {
-    pen.write(LOW, step_delay);
-  } else if (input == "NEXT_LINE") {
-
-    state.currentLine = state.currentLine + 1;
-    
-    long targetY = (long)Const::FIRST_LINE + (long)Const::ONE_LINE_WIDTH * (long)state.currentLine;
-    long deltaY = targetY - (long)state.y;
-
-    if (state.current_page) {
-      move.run(-state.x, deltaY);
-    } else {
-      move.run(30964-state.x, deltaY);
-    }
-    
-    Serial.print(state.y);
-    Serial.println(state.x);
-  } else if (input == "NEXT_PAGE") {
-    next_page();
-  } else {
-    int commaIndex = input.indexOf(',');
-    if (commaIndex != -1) {
-      long y = input.substring(0, commaIndex).toInt();
-      long x = input.substring(commaIndex + 1).toInt();
-      move.run(x, y);
-    }
-  }
-}
-
 void loop() {
   if (!calibrated) {
     next_page();
   }
-  
-  static String inputBuffer = "";
-  while (Serial.available() > 0 && queueCount < QUEUE_SIZE) {
-    char c = Serial.read();
-    if (c == '\r') continue;
-    if (c == '\n') {
-      String input = inputBuffer;
-      input.trim();
-      inputBuffer = "";
-      
-      if (input.length() == 0) continue;
 
-      commandQueue[queueHead] = input;
-      queueHead = (queueHead + 1) % QUEUE_SIZE;
-      queueCount++;
-      
-      Serial.println("DONE");
-    } else {
-      inputBuffer += c;
-      if (inputBuffer.length() > 1024) inputBuffer = "";
+  if (command == Const::COMMAND_PEN_DOWN) {
+    pen.write(HIGH);
+  } else if (command == Const::COMMAND_PEN_UP) {
+    pen.write(LOW);
+  } else if (command == Const::COMMAND_NEXT_LINE) {
+    double_motor_x.change_direction(HIGH);
+    double_motor_x.run(Const::ONE_LINE_WIDTH);
+  } else {
+    int comma_index = command.indexOf(',');
+    if (comma_index != 1) {
+        long x = command.substring(0, comma_index).toInt();
+        long y = command.substring(comma_index + 1).toInt();
+        move.run(x, y);
     }
   }
   
